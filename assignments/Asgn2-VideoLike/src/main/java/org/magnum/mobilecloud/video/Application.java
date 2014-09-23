@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.Http11NioProtocol;
+import org.magnum.mobilecloud.video.auth.OAuth2SecurityConfiguration;
+import org.magnum.mobilecloud.video.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -14,12 +16,19 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 //Tell Spring to automatically inject any dependencies that are marked in
 //our classes with @Autowired
 @EnableAutoConfiguration
+//Tell Spring to automatically create a JPA implementation of our
+//VideoRepository
+//@EnableJpaRepositories(basePackageClasses = VideoRepository.class)
 // Tell Spring to turn on WebMVC (e.g., it should enable the DispatcherServlet
 // so that requests can be routed to our Controllers)
 @EnableWebMvc
@@ -31,7 +40,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 // Any class in this package that is annotated with @Controller is going to be
 // automatically discovered and connected to the DispatcherServlet.
 @ComponentScan
-public class Application extends RepositoryRestMvcConfiguration {
+//We use the @Import annotation to include our OAuth2SecurityConfiguration
+//as part of this configuration so that we can have security and oauth
+//setup by Spring
+@Import(OAuth2SecurityConfiguration.class)
+public class Application /*extends RepositoryRestMvcConfiguration*/ {
 
 	// The app now requires that you pass the location of the keystore and
 	// the password for your private key that you would like to setup HTTPS
@@ -76,7 +89,7 @@ public class Application extends RepositoryRestMvcConfiguration {
 	//
 	//       http://tomcat.apache.org/tomcat-7.0-doc/ssl-howto.html
 	//
-    @Bean
+ /*   @Bean
     EmbeddedServletContainerCustomizer containerCustomizer(
             @Value("${keystore.file:src/main/resources/private/keystore}") String keystoreFile,
             @Value("${keystore.pass:changeit}") final String keystorePass) throws Exception {
@@ -108,9 +121,8 @@ public class Application extends RepositoryRestMvcConfiguration {
 			                        proto.setKeyAlias("tomcat");
 								}
 		                    });
-		    
 			}
         };
     }
-	
+*/
 }

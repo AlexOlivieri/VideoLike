@@ -1,5 +1,17 @@
 package org.magnum.mobilecloud.video.repository;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import com.google.common.base.Objects;
 
 /**
@@ -16,8 +28,11 @@ import com.google.common.base.Objects;
  * 
  * @author mitchell
  */
+@Entity
 public class Video {
-
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
 	private String name;
@@ -25,8 +40,8 @@ public class Video {
 	private long duration;
 	private long likes;
 	
-	public Video() {
-	}
+	@ElementCollection 
+	private List<String> likesUsernames = new ArrayList<>();
 
 	public Video(String name, String url, long duration, long likes) {
 		super();
@@ -105,4 +120,43 @@ public class Video {
 		}
 	}
 
+	public boolean likeVideo(String username){
+		for(String user : likesUsernames){
+			if(user.equals(username))
+				return false;
+		}
+		
+		likesUsernames.add(username);
+		likes++;
+		return true;
+	}
+	
+	public boolean unLikeVideo(String username){
+		for(String user : likesUsernames){
+			if(user.equals(username)){
+				likesUsernames.remove(username);
+				likes--;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public List<String> getUsersWhoLikedTheVideo(){
+		return likesUsernames;
+	}
 }
+	
+
+/*	public Set<String> getLikesUsernames() {
+	  return likeUsernames;
+	 }
+
+	public void like(String username) {
+	  this.likeUsernames.add(username);
+	}
+	
+	public void unlike(String username){
+		this.likeUsernames.remove(username);
+	}
+*/
